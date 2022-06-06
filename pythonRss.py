@@ -2,8 +2,8 @@
 """PythonRss 0.0.1
 
 Usage:
-    feed <rss-url>
-
+    python pythonRss.py <rss-url>
+    python pythonRss.py
 
 """
 import sys
@@ -33,8 +33,8 @@ def getURL():
             urlRequest.urlopen(url)
             return url
         except:
-            userChoice = input("The url is no valid, do you whant to enter another one?")
-            if userChoice.startwith('y'):
+            userChoice = input("The url is no valid, do you whant to enter another one? (yes/no) ")
+            if userChoice.startswith('y'):
                 continue
             else:
                 print("You choose not to continue, the progam will close shortly.")
@@ -55,28 +55,32 @@ def getTerminalParameter():
     else:
         return False
 
-
-def parseRssUrl(url):
-    feed = feedparser.parse(url)
-    post = feed.entries
-    for i in range(10):
-        print(f"[{i}] {post[i]['author']}: {post[i]['title']}\n")
-    return
-
-# starting to get tired of this codebas :
+# starting to get tired of this codebase :
 def dealwithhRssUrl(url):
+    quit = False
+
     feed = feedparser.parse(url)
     post = feed.entries
     for i in range(len(feed['entries'])):
-        print(f"[{i + 1}] {post[i]['author']}: {post[i]['title']} \n")
+        print(f"[{i}] {post[i]['author']}: {post[i]['title']} \n")
 
-    userChoice = input("What post do you whant to see >> ")
 
-    if userChoice not in range(len(feed['entries'])):
-        webbrowser.open_new(post[int(userChoice)]['link'])
-    else:
-        print("An error occure the program will shutdown")
-        exit()
+    while not quit:
+        userChoice = input("What post do you whant to see >> ")
+    # print(f"[ debug ] {userChoice} {len(feed.entries)} {int(userChoice) in range(len(feed['entries']))}")
+        if int(userChoice) in range(len(feed['entries'])):
+            webbrowser.open_new(post[int(userChoice)]['link'])
+        else:
+            print("An error occure the program will shutdown")
+            exit()
+
+        userOption = input("Do you whant to quit? (yes/no):  ")
+        if userOption.lower().startswith("y"):
+            continue
+            #print("[ debug ] this part is working ")
+        else:
+            quit = True
+            #print("[ debug ] this part should not be working ")
 
     return
 
@@ -87,9 +91,13 @@ def main():
         if len(sys.argv) == 2:
             url = validateUrl(sys.argv[1])
             dealwithhRssUrl(url)
+            print("Thanks for using PythonRss")
         else:
             programIntroduction()
-
+            url = getURL()
+            # print(f"[ debug ] {url}")
+            dealwithhRssUrl(url)
+            print("Thanks for using pythonRss")
     else:
         print("Sorry, we couldn't find a internet connection.")
     return 0
